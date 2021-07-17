@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -13,19 +14,16 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        //
+        $cats = Category::get();
+        return view("categories.index" ,["categories"=>$cats]);
     }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function all()
     {
-        //
+        $cats = Category::get();
+        return  $cats;//view("categories.index" ,["categories"=>$cats]);
     }
 
+   
     /**
      * Store a newly created resource in storage.
      *
@@ -34,7 +32,18 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // dd($request->all());
+        // validation 
+        $request->validate([
+            "name"=>"required|alpha",
+            "comments"=>"required|max:1000"
+        ]);
+        $cat = new Category();
+        $cat->cat_name = $request->name;
+        $cat->comments = $request->comments;
+        $cat->save();
+        return redirect()->route("category.index");
+
     }
 
     /**
@@ -79,6 +88,13 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        //
+        // $cat = Category::find($id);
+        $cat = Category::findorFail($id);
+        // dd($cat);
+        $cat->delete();
+
+        // return redirect("/category");
+        return redirect()->route("category.index");
+
     }
 }
